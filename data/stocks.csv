@@ -1,0 +1,41 @@
+Symbol,Name,Exchange,Type,Brand
+RELIANCE,Reliance Industries Limited,NSE,Stock,Jio
+TCS,Tata Consultancy Services Limited,NSE,Stock,Tata
+HDFCBANK,HDFC Bank Limited,NSE,Stock,HDFC
+INFY,Infosys Limited,NSE,Stock,Infosys
+ICICIBANK,ICICI Bank Limited,NSE,Stock,ICICI
+HINDUNILVR,Hindustan Unilever Limited,NSE,Stock,Unilever
+SBIN,State Bank of India,NSE,Stock,SBI
+BHARTIARTL,Bharti Airtel Limited,NSE,Stock,Airtel
+ITC,ITC Limited,NSE,Stock,ITC
+KOTAKBANK,Kotak Mahindra Bank Limited,NSE,Stock,Kotak
+LTIM,LTIMindtree Limited,NSE,Stock,L&T
+LT,Larsen & Toubro Limited,NSE,Stock,L&T
+AXISBANK,Axis Bank Limited,NSE,Stock,Axis
+ASIANPAINT,Asian Paints Limited,NSE,Stock,Asian Paints
+MARUTI,Maruti Suzuki India Limited,NSE,Stock,Maruti
+SUNPHARMA,Sun Pharmaceutical Industries Limited,NSE,Stock,Sun Pharma
+TITAN,Titan Company Limited,NSE,Stock,Titan
+BAJFINANCE,Bajaj Finance Limited,NSE,Stock,Bajaj
+ULTRACEMCO,UltraTech Cement Limited,NSE,Stock,UltraTech
+WIPRO,Wipro Limited,NSE,Stock,Wipro
+RELIANCE,Reliance Industries Limited,BSE,Stock,Jio
+TCS,Tata Consultancy Services Limited,BSE,Stock,Tata
+HDFCBANK,HDFC Bank Limited,BSE,Stock,HDFC
+INFY,Infosys Limited,BSE,Stock,Infosys
+ICICIBANK,ICICI Bank Limited,BSE,Stock,ICICI
+HINDUNILVR,Hindustan Unilever Limited,BSE,Stock,Unilever
+SBIN,State Bank of India,BSE,Stock,SBI
+BHARTIARTL,Bharti Airtel Limited,BSE,Stock,Airtel
+ITC,ITC Limited,BSE,Stock,ITC
+KOTAKBANK,Kotak Mahindra Bank Limited,BSE,Stock,Kotak
+LTIM,LTIMindtree Limited,BSE,Stock,L&T
+LT,Larsen & Toubro Limited,BSE,Stock,L&T
+AXISBANK,Axis Bank Limited,BSE,Stock,Axis
+ASIANPAINT,Asian Paints Limited,BSE,Stock,Asian Paints
+MARUTI,Maruti Suzuki India Limited,BSE,Stock,Maruti
+SUNPHARMA,Sun Pharmaceutical Industries Limited,BSE,Stock,Sun Pharma
+TITAN,Titan Company Limited,BSE,Stock,Titan
+BAJFINANCE,Bajaj Finance Limited,BSE,Stock,Bajaj
+ULTRACEMCO,UltraTech Cement Limited,BSE,Stock,UltraTech
+WIPRO,Wipro Limited,BSE,Stock,Wipro
