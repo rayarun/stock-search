@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MarketFinder Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="mobile.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen active">
+        <div class="mobile-header">
+            <h1 class="app-title">MarketFinder</h1>
+            <p class="app-subtitle">Search NSE & BSE stocks</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-box">
+                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="mobileSearchInput" placeholder="Search stocks..." autocomplete="off">
+            </div>
+        </div>
+
+        <div id="mobileResults" class="results-container">
+            <div class="empty-state">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <line x1="12" y1="1" x2="12" y2="23"></line>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+                <p>Start typing to search stocks</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stock Detail Screen -->
+    <div id="detail-screen" class="screen">
+        <div class="detail-header">
+            <button class="back-btn" onclick="goBack()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+            </button>
+            <div class="header-info">
+                <h2 id="stockName">Loading...</h2>
+                <span id="stockExchange" class="exchange-badge">NSE</span>
+            </div>
+        </div>
+
+        <div id="stockDetailContent" class="detail-content">
+            <div class="loading">Loading stock details...</div>
+        </div>
+    </div>
+
+    <script src="mobile.js"></script>
+</body>
+
+</html>

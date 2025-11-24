@@ -1,0 +1,365 @@
+:root {
+    --primary-color: #eb5b3c;
+    --secondary-color: #44475b;
+    --text-color: #2c2e3e;
+    --text-muted: #7c7e8c;
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --border-color: #e5e7eb;
+    --success-color: #00d09c;
+    --danger-color: #eb5b3c;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Mobile Header */
+.mobile-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #d94a2e 100%);
+    color: white;
+    padding: 2rem 1.5rem 2.5rem;
+    text-align: center;
+}
+
+.app-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.app-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Search Section */
+.search-section {
+    padding: 0 1.5rem;
+    margin-top: -1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    box-shadow: 0 6px 20px rgba(235, 91, 60, 0.15);
+}
+
+.search-icon {
+    color: var(--text-muted);
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+input {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1rem;
+    width: 100%;
+    font-family: inherit;
+    outline: none;
+}
+
+input::placeholder {
+    color: var(--text-muted);
+}
+
+/* Results Container */
+.results-container {
+    padding: 0 1.5rem;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-muted);
+}
+
+.empty-state svg {
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.empty-state p {
+    font-size: 0.95rem;
+}
+
+/* Stock Cards */
+.stock-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+}
+
+.stock-card:active {
+    transform: scale(0.98);
+    box-shadow: var(--shadow-md);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.symbol {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.exchange-badge {
+    background: linear-gradient(135deg, var(--primary-color), #d94a2e);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+.name {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Detail Screen */
+.detail-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #d94a2e 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-md);
+}
+
+.back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.back-btn:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(0.95);
+}
+
+.header-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.header-info h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Detail Content */
+.detail-content {
+    padding: 1.5rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-muted);
+}
+
+.price-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.current-price {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.price-change {
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.price-change.positive {
+    color: var(--success-color);
+}
+
+.price-change.negative {
+    color: var(--danger-color);
+}
+
+.time-period-label {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-left: 0.5rem;
+}
+
+/* Time Period Filters */
+.period-filters {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
+}
+
+.period-btn {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-color);
+    padding: 0.65rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.period-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.period-btn:active {
+    transform: scale(0.95);
+}
+
+/* Chart Container */
+.chart-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    height: 300px;
+}
+
+canvas {
+    max-width: 100%;
+    height: 100%;
+}
+
+/* Error State */
+.error {
+    background: #fee;
+    color: var(--danger-color);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+    .screen {
+        max-width: 480px;
+        margin: 0 auto;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .mobile-header {
+        border-radius: 0;
+    }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+    .mobile-header {
+        padding-top: max(2rem, env(safe-area-inset-top));
+    }
+
+    .detail-header {
+        padding-top: max(1.5rem, env(safe-area-inset-top));
+    }
+}

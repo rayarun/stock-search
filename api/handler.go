@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"stock-search/credentials"
 	"stock-search/models"
 	"stock-search/search"
 	"strings"
@@ -62,11 +63,35 @@ func (h *Handler) GetStock(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Fetch Real Data from Yahoo Finance with period-specific granularity
-	yahooData, err := fetchYahooData(stock.Symbol, stock.Exchange, period)
+	// Get data provider parameter (default to yahoo)
+	provider := r.URL.Query().Get("provider")
+	if provider == "" {
+		provider = "yahoo"
+	}
+
+	var stockData *YahooData
+	var err error
+
+	// Try Angel One if selected
+	if provider == "angelone" {
+		// Use environment variable provider by default
+		// Users can replace this with KMS provider
+		credProvider := credentials.NewEnvProvider()
+		stockData, err = FetchAngelOneData(stock.Symbol, stock.Exchange, period, credProvider)
+
+		if err != nil {
+			// Fallback to Yahoo Finance
+			fmt.Printf("Angel One failed (%v), falling back to Yahoo Finance\n", err)
+			stockData, err = fetchYahooData(stock.Symbol, stock.Exchange, period)
+		}
+	} else {
+		// Use Yahoo Finance
+		stockData, err = fetchYahooData(stock.Symbol, stock.Exchange, period)
+	}
+
 	if err != nil {
-		// Fallback to mock data if Yahoo fails
-		fmt.Println("Error fetching Yahoo data:", err)
+		// Fallback to mock data if both providers fail
+		fmt.Println("Error fetching data:", err)
 		serveMockData(w, stock, period)
 		return
 	}
@@ -78,9 +103,9 @@ func (h *Handler) GetStock(w http.ResponseWriter, r *http.Request) {
 		History          []PricePoint `json:"history"`
 	}{
 		Stock:            stock,
-		CurrentPrice:     yahooData.CurrentPrice,
-		PreviousDayClose: yahooData.PreviousDayClose,
-		History:          yahooData.History,
+		CurrentPrice:     stockData.CurrentPrice,
+		PreviousDayClose: stockData.PreviousDayClose,
+		History:          stockData.History,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
