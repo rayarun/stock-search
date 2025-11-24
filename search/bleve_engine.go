@@ -11,10 +11,29 @@ import (
 )
 
 type BleveEngine struct {
-	index bleve.Index
+	index    bleve.Index
+	semantic *SemanticSearch
 }
 
-func NewBleveEngine(indexPath string, stocks []models.Stock) (*BleveEngine, error) {
+func NewBleveEngine(indexPath string, stocks []models.Stock, semanticMappingsPath string) (*BleveEngine, error) {
+	// Initialize semantic search
+	semantic, err := NewSemanticSearch(semanticMappingsPath)
+	if err != nil {
+		log.Printf("Warning: Failed to load semantic search: %v", err)
+		// Continue without semantic search
+	}
+
+	// Enrich stocks with sector/industry data from semantic mappings
+	if semantic != nil {
+		for i := range stocks {
+			if stocks[i].Sector == "" {
+				stocks[i].Sector = semantic.GetSectorForSymbol(stocks[i].Symbol)
+			}
+			if stocks[i].Industry == "" {
+				stocks[i].Industry = semantic.GetIndustryForSymbol(stocks[i].Symbol)
+			}
+		}
+	}
 	// Try to open existing index
 	index, err := bleve.Open(indexPath)
 	if err == bleve.ErrorIndexPathDoesNotExist {
@@ -46,7 +65,10 @@ func NewBleveEngine(indexPath string, stocks []models.Stock) (*BleveEngine, erro
 		log.Println("Opened existing index.")
 	}
 
-	return &BleveEngine{index: index}, nil
+	return &BleveEngine{
+		index:    index,
+		semantic: semantic,
+	}, nil
 }
 
 func buildIndexMapping() mapping.IndexMapping {
@@ -64,12 +86,138 @@ func buildIndexMapping() mapping.IndexMapping {
 	stockMapping.AddFieldMappingsAt("popularity_score", popularityFieldMapping)
 	stockMapping.AddFieldMappingsAt("popularityscore", popularityFieldMapping)
 
+	// Add text field mappings for semantic search fields
+	textFieldMapping := bleve.NewTextFieldMapping()
+	textFieldMapping.Store = true
+	textFieldMapping.Index = true
+	stockMapping.AddFieldMappingsAt("sector", textFieldMapping)
+	stockMapping.AddFieldMappingsAt("industry", textFieldMapping)
+	stockMapping.AddFieldMappingsAt("tags", textFieldMapping)
+
 	indexMapping.AddDocumentMapping("_default", stockMapping)
 
 	return indexMapping
 }
 
 func (e *BleveEngine) Search(query string) []models.Stock {
+	// Check if this is a semantic query
+	if e.semantic != nil && e.semantic.IsSemanticQuery(query) {
+		return e.semanticSearch(query)
+	}
+
+	// Use regular search for non-semantic queries
+	return e.regularSearch(query)
+}
+
+// semanticSearch handles natural language queries like "top broking stocks"
+func (e *BleveEngine) semanticSearch(query string) []models.Stock {
+	// Extract sectors from the query
+	sectors := e.semantic.ExtractSectors(query)
+
+	if len(sectors) == 0 {
+		// No sectors found, fall back to regular search
+		return e.regularSearch(query)
+	}
+
+	// Get stock symbols for the matched sectors
+	targetSymbols := e.semantic.GetStockSymbolsForSectors(sectors)
+
+	if len(targetSymbols) == 0 {
+		return []models.Stock{}
+	}
+
+	// Build queries for each symbol and combine them
+	if len(targetSymbols) == 0 {
+		return []models.Stock{}
+	}
+
+	// Create first query
+	firstQuery := bleve.NewTermQuery(strings.ToLower(targetSymbols[0]))
+	firstQuery.SetField("symbol")
+	searchQuery := bleve.NewDisjunctionQuery(firstQuery)
+
+	// Add remaining queries
+	for i := 1; i < len(targetSymbols); i++ {
+		termQuery := bleve.NewTermQuery(strings.ToLower(targetSymbols[i]))
+		termQuery.SetField("symbol")
+		searchQuery.AddQuery(termQuery)
+	}
+
+	searchRequest := bleve.NewSearchRequest(searchQuery)
+	searchRequest.Fields = []string{"symbol", "name", "exchange", "type", "brand", "sector", "industry", "tags", "popularity_score"}
+	searchRequest.Size = 100
+
+	searchResults, err := e.index.Search(searchRequest)
+	if err != nil {
+		log.Printf("Semantic search error: %v", err)
+		return []models.Stock{}
+	}
+
+	// Helper functions
+	getString := func(fields map[string]interface{}, key string) string {
+		if val, ok := fields[key].(string); ok {
+			return val
+		}
+		return ""
+	}
+
+	getFloat := func(fields map[string]interface{}, key string) float64 {
+		if val, ok := fields[key].(float64); ok {
+			return val
+		}
+		return 0.0
+	}
+
+	// Build results with scores
+	type ScoredStock struct {
+		Stock      models.Stock
+		FinalScore float64
+	}
+
+	var scoredResults []ScoredStock
+	for _, hit := range searchResults.Hits {
+		popularityScore := getFloat(hit.Fields, "popularity_score")
+
+		stock := models.Stock{
+			Symbol:          getString(hit.Fields, "symbol"),
+			Name:            getString(hit.Fields, "name"),
+			Exchange:        getString(hit.Fields, "exchange"),
+			Type:            getString(hit.Fields, "type"),
+			Brand:           getString(hit.Fields, "brand"),
+			Sector:          getString(hit.Fields, "sector"),
+			Industry:        getString(hit.Fields, "industry"),
+			Tags:            getString(hit.Fields, "tags"),
+			PopularityScore: popularityScore,
+		}
+
+		// For semantic search, prioritize popularity score
+		// since all results are equally relevant (from same sector)
+		scoredResults = append(scoredResults, ScoredStock{
+			Stock:      stock,
+			FinalScore: popularityScore,
+		})
+	}
+
+	// Sort by popularity score (descending)
+	for i := 0; i < len(scoredResults); i++ {
+		for j := i + 1; j < len(scoredResults); j++ {
+			if scoredResults[j].FinalScore > scoredResults[i].FinalScore {
+				scoredResults[i], scoredResults[j] = scoredResults[j], scoredResults[i]
+			}
+		}
+	}
+
+	// Extract just the stocks
+	var results []models.Stock
+	for _, scored := range scoredResults {
+		results = append(results, scored.Stock)
+	}
+
+	return results
+}
+
+// regularSearch is the original search logic extracted for reuse
+func (e *BleveEngine) regularSearch(query string) []models.Stock {
 	// Advanced search with match-type boosting and popularity ranking
 
 	// 1. Exact Symbol Match (highest priority, boost = 10.0)
@@ -113,7 +261,7 @@ func (e *BleveEngine) Search(query string) []models.Stock {
 	)
 
 	searchRequest := bleve.NewSearchRequest(searchQuery)
-	searchRequest.Fields = []string{"symbol", "name", "exchange", "type", "brand", "popularity_score"}
+	searchRequest.Fields = []string{"symbol", "name", "exchange", "type", "brand", "sector", "industry", "tags", "popularity_score"}
 	searchRequest.Size = 100 // Get more results for better ranking
 
 	searchResults, err := e.index.Search(searchRequest)
@@ -155,6 +303,9 @@ func (e *BleveEngine) Search(query string) []models.Stock {
 			Exchange:        getString(hit.Fields, "exchange"),
 			Type:            getString(hit.Fields, "type"),
 			Brand:           getString(hit.Fields, "brand"),
+			Sector:          getString(hit.Fields, "sector"),
+			Industry:        getString(hit.Fields, "industry"),
+			Tags:            getString(hit.Fields, "tags"),
 			PopularityScore: popularityScore,
 		}
 

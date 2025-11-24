@@ -55,8 +55,8 @@ func main() {
 		}
 	}
 
-	// Initialize Search Engine (Bleve)
-	engine, err := search.NewBleveEngine("stock_index.bleve", allStocks)
+	// Initialize Search Engine (Bleve) with semantic search support
+	engine, err := search.NewBleveEngine("stock_index.bleve", allStocks, "data/sector_mappings.json")
 	if err != nil {
 		log.Fatalf("Failed to initialize search engine: %v", err)
 	}

@@ -166,6 +166,10 @@ func LoadNSEStocks(filePath string) ([]models.Stock, error) {
 		stocks = append(stocks, stock)
 	}
 
+	// Apply automatic classification
+	classifier := NewStockClassifier()
+	stocks = classifier.ClassifyBatch(stocks)
+
 	return stocks, nil
 }
 
@@ -202,6 +206,10 @@ func LoadBSEStocks(filePath string) ([]models.Stock, error) {
 		}
 		stocks = append(stocks, stock)
 	}
+
+	// Apply automatic classification
+	classifier := NewStockClassifier()
+	stocks = classifier.ClassifyBatch(stocks)
 
 	return stocks, nil
 }
